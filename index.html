@@ -51,10 +51,8 @@
   <input id="photo" name="photo" type="file"/>
 </div>
     <div id="error"></div>
-    <input id="agreeCheckbox" type="checkbox"/><label for="agreeCheckbox"> С оффертой ознакомлен!</label>
     <div class="button-group">
-      <button disabled="disabled" id="submit" type="submit">Зарегистрироваться</button>
-      <button id="reset" style="margin-left: 10px" type="reset">Отмена</button>
+      <button id="submit" type="submit">Зарегистрироваться</button>
     </div>
   </form>
 
@@ -325,17 +323,6 @@ let contactNumberInput = document.getElementById("phone");
 
         document.getElementById('modalContent').innerHTML = content;
         document.getElementById('modal').style.display = 'flex';
-    });
-</script>
-
-<script>
-    document.getElementById('agreeCheckbox').addEventListener('change', function() {
-        var btn = document.querySelector('button[disabled]');
-        if (this.checked) {
-            btn.removeAttribute('disabled');
-        } else {
-            btn.setAttribute('disabled', 'disabled');
-        }
     });
 </script>
 
