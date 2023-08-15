@@ -26,20 +26,6 @@
       <input type="text" id="phone" inputmode="numeric" name="phone" placeholder="Телефон" value="+7">
     </div>
     <div>
-      <select id="type" name="type">
-        <option value="hot_water">Горячая вода</option>
-        <option value="cold_water">Холодная вода</option>
-      </select>
-    </div>
-    <div>
-      <select id="model" name="model">
-        <option value="">Выберите модификацию</option>
-        <option value="СГВ-15">СГВ-15</option>
-        <option value="other">Другая</option>
-      </select>
-      <input type="text" id="other_model" name="other_model" placeholder="Введите модификацию" style="display:none;">
-    </div>
-    <div>
       <input type="text" id="serial" name="serial" placeholder="Заводской номер">
     </div>
     <div>
@@ -60,8 +46,6 @@
     let tg = window.Telegram.WebApp;
     let submit = document.getElementById("submit");
     let reset = document.getElementById("reset");
-    let model_select = document.getElementById("model");
-    let other_model_input = document.getElementById("other_model");
     let photoInput = document.getElementById("photo");
 
     photoInput.addEventListener("change", function(event) {
@@ -77,22 +61,8 @@
       }
     });
 
-    model_select.addEventListener("change", function() {
-      if (model_select.value === "other") {
-        other_model_input.style.display = "block";
-      } else {
-        other_model_input.style.display = "none";
-      }
-    });
-
     let type_select = document.getElementById("type");
     tg.expand();
-
-    let other_model_value = "";
-
-    other_model_input.addEventListener("input", function() {
-      other_model_value = other_model_input.value;
-    });
 
     document.querySelector("form").addEventListener("submit", (event) => {
       event.preventDefault();
@@ -100,17 +70,10 @@
       let fullname = document.getElementById("fullname");
       let address = document.getElementById("address");
       let phone = document.getElementById("phone");
-      let model = document.getElementById("model");
       let serial = document.getElementById("serial");
       let year = document.getElementById("year");
       let reading = document.getElementById("reading");
-      let other_model = document.getElementById("other_model");
       let error = document.getElementById("error");
-
-      let model_value = model.value;
-      if (model_value === "other" && other_model_value.trim() !== "") {
-        model_value = encodeURIComponent(other_model_value);
-      }
 
       error.innerText = "";
       let invalidFields = [];
@@ -134,18 +97,6 @@
         invalidFields.push("Телефон");
       } else {
         phone.classList.remove("error");
-      }
-
-      if (model.value === "other") {
-        if (other_model.value.trim() === "") {
-          other_model.classList.add("error");
-          invalidFields.push("Модификация");
-        } else {
-          other_model.classList.remove("error");
-          model.value = other_model_value;
-        }
-      } else {
-        other_model.classList.remove("error");
       }
 
       if (serial.value.trim() === "") {
@@ -179,8 +130,6 @@
           fullname: fullname.value,
           address: address.value,
           phone: phone.value,
-          type: type_select.value,
-          model: model_value,
           serial: serial.value,
           year: year.value,
           reading: reading.value,
@@ -194,8 +143,6 @@
           fullname: fullname.value,
           address: address.value,
           phone: phone.value,
-          type: type_select.value,
-          model: model_value,
           serial: serial.value,
           year: year.value,
           reading: reading.value,
