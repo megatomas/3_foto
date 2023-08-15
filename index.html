@@ -16,13 +16,6 @@
       <div>
         <input type="text" id="fullname" name="fullname" placeholder="Клиент">
       </div>
-
-      <div>
-        <select id="type" name="type">
-          <option value="hot_water">Горячая вода</option>
-          <option value="cold_water">Холодная вода</option>
-        </select>
-      </div>
       <div id="error"></div>
       <div class="button-group">
         <button type="submit" id="submit">Отправить</button>
@@ -45,7 +38,6 @@
 
         let data = {
           fullname: fullname.value,
-          type: type_select.value,
         };
 
         tg.sendData(JSON.stringify(data));
