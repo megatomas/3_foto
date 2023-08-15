@@ -1,98 +1,61 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Форма ввода</title>
-  <style>
-    .error {
-      border: 2px solid red;
-    }
-  </style>
-</head>
-<body>
-  <form>
-    <div>
-      <input type="text" id="fullname" name="fullname" placeholder="КЛИЕНТ">
-    </div>
-    <div>
-      <input type="file" id="photo" name="photo" accept="image/*">
-    </div>
-    <div id="error"></div>
-    <div class="button-group">
-      <button type="button" id="submit">Отправить</button>
-    </div>
-  </form>
-
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script>
-    let tg = window.Telegram.WebApp;
-    let submit = document.getElementById("submit");
-
-    let fullname = document.getElementById("fullname");
-    let photoInput = document.getElementById("photo");
-    let error = document.getElementById("error");
-
-    submit.addEventListener("click", async (event) => {
-      event.preventDefault();
-
-      error.innerText = "";
-
-      if (fullname.value.trim() === "") {
-        fullname.classList.add("error");
-        error.innerText = "Пожалуйста, введите имя клиента.";
-        return;
-      } else {
-        fullname.classList.remove("error");
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Форма ввода</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+      .error {
+        border: 2px solid red;
       }
+    </style>
+  </head>
+  <body>
+    <form enctype="multipart/form-data">
+      <div>
+        <input type="text" id="fullname" name="fullname" placeholder="Клиент">
+      </div>
 
-      if (!photoInput.files[0]) {
-        error.innerText = "Пожалуйста, выберите фотографию.";
-        return;
-      }
+      <div>
+        <select id="type" name="type">
+          <option value="hot_water">Горячая вода</option>
+          <option value="cold_water">Холодная вода</option>
+        </select>
+      </div>
+      <div id="error"></div>
+      <div class="button-group">
+        <button type="submit" id="submit">Отправить</button>
+        <button type="reset" id="reset" style="margin-left: 10px">Отмена</button>
+      </div>
+    </form>
 
-      const file = photoInput.files[0];
-      const fileContent = await file.arrayBuffer();
-      const fileName = file.name;
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      let tg = window.Telegram.WebApp;
+      tg.expand();
 
-      const repoPath = "3_foto"; // Путь к папке на GitHub Pages
-      const commitMessage = "Добавление фото"; // Сообщение коммита
-      const branchName = "main"; // Имя ветки
+      let submit = document.getElementById("submit");
+      let error = document.getElementById("error");
 
-      const url = `https://api.github.com/repos/megatomas/megatomas.github.io/contents/${repoPath}/${fileName}`;
-      const token = "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"; // Замените на свой токен доступа
+      submit.addEventListener("click", (event) => {
+        event.preventDefault();
 
-      const content = btoa(new Uint8Array(fileContent).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        let fullname = document.getElementById("fullname");
 
-      const data = {
-        message: commitMessage,
-        branch: branchName,
-        content: content,
-      };
-
-      fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      })
-      .then(response => response.json())
-      .then(responseData => {
-        const photoUrl = responseData.content.download_url;
-        let telegramData = {
+        let data = {
           fullname: fullname.value,
-          photoUrl: photoUrl,
+          type: type_select.value,
         };
-        tg.sendData(JSON.stringify(telegramData));
+
+        tg.sendData(JSON.stringify(data));
         tg.close();
-      })
-      .catch(error => {
-        console.error(error);
-        error.innerText = "Ошибка при загрузке фото на GitHub.";
       });
-    });
-  </script>
-</body>
+
+      let reset = document.getElementById("reset");
+      reset.addEventListener("click", () => {
+        tg.close();
+      });
+    </script>
+  </body>
 </html>
