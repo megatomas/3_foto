@@ -94,7 +94,7 @@
       other_model_value = other_model_input.value;
     });
 
-    submit.addEventListener("click", (event) => {
+    document.querySelector("form").addEventListener("submit", (event) => {
       event.preventDefault();
 
       let fullname = document.getElementById("fullname");
