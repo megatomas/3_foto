@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Форма ввода</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
   <style>
     .error {
       border: 2px solid red;
@@ -12,75 +11,87 @@
   </style>
 </head>
 <body>
-  <form enctype="multipart/form-data" id="myForm">
+  <form>
     <div>
-      <input type="text" id="fullname" name="fullname" placeholder="Клиент">
+      <input type="text" id="fullname" name="fullname" placeholder="КЛИЕНТ">
     </div>
     <div>
       <input type="file" id="photo" name="photo" accept="image/*">
     </div>
     <div id="error"></div>
     <div class="button-group">
-      <button type="submit" id="submit" disabled>Отправить</button>
-      <button type="reset" id="reset" style="margin-left: 10px">Отмена</button>
+      <button type="button" id="submit">Отправить</button>
     </div>
   </form>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     let tg = window.Telegram.WebApp;
-    let myForm = document.getElementById("myForm");
-    let reset = document.getElementById("reset");
+    let submit = document.getElementById("submit");
+
+    let fullname = document.getElementById("fullname");
     let photoInput = document.getElementById("photo");
-    let submitButton = document.getElementById("submit");
+    let error = document.getElementById("error");
 
-    myForm.addEventListener("submit", function(event) {
-      event.preventDefault(); // Prevent default form submission
+    submit.addEventListener("click", async (event) => {
+      event.preventDefault();
 
-      try {
-        const fullname = document.getElementById("fullname").value;
-        const file = photoInput.files[0];
+      error.innerText = "";
 
-        if (file) {
-          const reader = new FileReader();
-          reader.onloadend = function() {
-            const photoBase64 = reader.result.split(',')[1];
-            const data = {
-              fullname: fullname,
-              photo: photoBase64 || "",
-            };
-
-            tg.sendData(JSON.stringify(data));
-            tg.close();
-          };
-          reader.readAsDataURL(file);
-        } else {
-          const data = {
-            fullname: fullname,
-            photo: "",
-          };
-
-          tg.sendData(JSON.stringify(data));
-          tg.close();
-        }
-      } catch (error) {
-        console.error("Ошибка при отправке данных:", error);
+      if (fullname.value.trim() === "") {
+        fullname.classList.add("error");
+        error.innerText = "Пожалуйста, введите имя клиента.";
+        return;
+      } else {
+        fullname.classList.remove("error");
       }
-    });
 
-    reset.addEventListener("click", () => {
-      tg.close();
-    });
-
-    photoInput.addEventListener("change", function(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = function() {
-          photoInput.dataset.base64 = reader.result.split(',')[1];
-          submitButton.removeAttribute("disabled"); // Активируем кнопку
-        }
-        reader.readAsDataURL(file);
+      if (!photoInput.files[0]) {
+        error.innerText = "Пожалуйста, выберите фотографию.";
+        return;
       }
+
+      const file = photoInput.files[0];
+      const fileContent = await file.arrayBuffer();
+      const fileName = file.name;
+
+      const repoPath = "3_foto"; // Путь к папке на GitHub Pages
+      const commitMessage = "Добавление фото"; // Сообщение коммита
+      const branchName = "main"; // Имя ветки
+
+      const url = `https://api.github.com/repos/megatomas/megatomas.github.io/contents/${repoPath}/${fileName}`;
+      const token = "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"; // Замените на свой токен доступа
+
+      const content = btoa(new Uint8Array(fileContent).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+
+      const data = {
+        message: commitMessage,
+        branch: branchName,
+        content: content,
+      };
+
+      fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json())
+      .then(responseData => {
+        const photoUrl = responseData.content.download_url;
+        let telegramData = {
+          fullname: fullname.value,
+          photoUrl: photoUrl,
+        };
+        tg.sendData(JSON.stringify(telegramData));
+        tg.close();
+      })
+      .catch(error => {
+        console.error(error);
+        error.innerText = "Ошибка при загрузке фото на GitHub.";
+      });
     });
   </script>
 </body>
