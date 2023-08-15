@@ -20,19 +20,19 @@
       <input type="file" id="photo" name="photo" accept="image/*">
     </div>
     <div>
-      <textarea id="address" name="address" placeholder="Адрес"></textarea>
+
     </div>
     <div>
-      <input type="text" id="phone" inputmode="numeric" name="phone" placeholder="Телефон" value="+7">
+
     </div>
     <div>
-      <input type="text" id="serial" name="serial" placeholder="Заводской номер">
+
     </div>
     <div>
-      <input type="text" id="year" inputmode="numeric" name="year" placeholder="Год выпуска">
+
     </div>
     <div>
-      <input type="text" id="reading" inputmode="numeric" name="reading" placeholder="Показания">
+
     </div>
     <div id="error"></div>
     <div class="button-group">
@@ -50,75 +50,17 @@
 
     photoInput.addEventListener("change", function(event) {
       const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          let dataUrl = e.target.result;
-          let base64Image = dataUrl.split(',')[1]; // Извлечение данных в формате base64
-          photoInput.dataset.base64 = base64Image;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
 
-    let type_select = document.getElementById("type");
-    tg.expand();
 
-    document.querySelector("form").addEventListener("submit", (event) => {
-      event.preventDefault();
 
-      let fullname = document.getElementById("fullname");
-      let address = document.getElementById("address");
-      let phone = document.getElementById("phone");
-      let serial = document.getElementById("serial");
-      let year = document.getElementById("year");
-      let reading = document.getElementById("reading");
-      let error = document.getElementById("error");
 
-      error.innerText = "";
-      let invalidFields = [];
 
-      if (fullname.value.trim() === "") {
-        fullname.classList.add("error");
-        invalidFields.push("Клиент");
-      } else {
-        fullname.classList.remove("error");
-      }
 
-      if (address.value.trim() === "") {
-        address.classList.add("error");
-        invalidFields.push("Адрес");
-      } else {
-        address.classList.remove("error");
-      }
 
-      if (phone.value.trim() === "" || !/^\+7\d{10}$/.test(phone.value)) {
-        phone.classList.add("error");
-        invalidFields.push("Телефон");
-      } else {
-        phone.classList.remove("error");
-      }
 
-      if (serial.value.trim() === "") {
-        serial.classList.add("error");
-        invalidFields.push("Заводской номер");
-      } else {
-        serial.classList.remove("error");
-      }
 
-      if (year.value.trim() === "") {
-        year.classList.add("error");
-        invalidFields.push("Год выпуска");
-      } else {
-        year.classList.remove("error");
-      }
 
-      if (reading.value.trim() === "") {
-        reading.classList.add("error");
-        invalidFields.push("Показания");
-      } else {
-        reading.classList.remove("error");
-      }
+
 
       if (invalidFields.length > 0) {
         error.innerText = "Пожалуйста, заполните следующие поля корректно: " + invalidFields.join(", ");
