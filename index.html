@@ -1,190 +1,180 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Форма ввода</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <style>
-      .error {
-        border: 2px solid red;
-      }
-    </style>
-  </head>
-  <body>
-    <form enctype="multipart/form-data">
-      <div>
-        <input type="text" id="fullname" name="fullname" placeholder="Клиент">
-      </div>
-      <div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Форма ввода</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <style>
+    .error {
+      border: 2px solid red;
+    }
+  </style>
+</head>
+<body>
+  <form enctype="multipart/form-data">
+    <div>
+      <input type="text" id="fullname" name="fullname" placeholder="Клиент">
+    </div>
+    <div>
       <input type="file" id="photo" name="photo" accept="image/*">
     </div>
-      <div>
-        <textarea id="address" name="address" placeholder="Адрес"></textarea>
-      </div>
-      <div>
-        <input type="text" id="phone" inputmode="numeric" name="phone" placeholder="Телефон" value="+7">
-      </div>
-      <div>
-        <select id="type" name="type">
-          <option value="hot_water">Горячая вода</option>
-          <option value="cold_water">Холодная вода</option>
-        </select>
-      </div>
-      <div>
-        <select id="model" name="model">
-          <option value="">Выберите модификацию</option>
-          <option value="СГВ-15">СГВ-15</option>
-          <option value="СВКМ-15">СВКМ-15</option>
-          <option value="СВК-15-3-2">СВК-15-3-2</option>
-          <option value="VLF-U">VLF-U</option>
-          <option value="СВК-15">СВК-15</option>
-          <option value="ВСКМ 90-15">ВСКМ 90-15</option>
-          <option value="СВ-15">СВ-15</option>
-          <option value="СВУ-15">СВУ-15</option>
-          <option value="VLF-R">VLF-R</option>
-          <option value="СВК-15-1,5">СВК-15-1,5</option>
-          <option value="other">Другая</option>
-        </select>
-        <input type="text" id="other_model" name="other_model" placeholder="Введите модификацию" style="display:none;">
-      </div>
-      <div>
-        <input type="text" id="serial" name="serial" placeholder="Заводской номер">
-      </div>
-      <div>
-        <input type="text" id="year" inputmode="numeric" name="year" placeholder="Год выпуска">
-      </div>
-      <div>
-        <input type="text" id="reading" inputmode="numeric" name="reading" placeholder="Показания">
-      </div>
-      <div id="error"></div>
-      <div class="button-group">
-        <button type="submit" id="submit">Отправить</button>
-        <button type="reset" id="reset" style="margin-left: 10px">Отмена</button>
-      </div>
-    </form>
+    <div>
+      <textarea id="address" name="address" placeholder="Адрес"></textarea>
+    </div>
+    <div>
+      <input type="text" id="phone" inputmode="numeric" name="phone" placeholder="Телефон" value="+7">
+    </div>
+    <div>
+      <select id="type" name="type">
+        <option value="hot_water">Горячая вода</option>
+        <option value="cold_water">Холодная вода</option>
+      </select>
+    </div>
+    <div>
+      <select id="model" name="model">
+        <option value="">Выберите модификацию</option>
+        <option value="СГВ-15">СГВ-15</option>
+        <option value="other">Другая</option>
+      </select>
+      <input type="text" id="other_model" name="other_model" placeholder="Введите модификацию" style="display:none;">
+    </div>
+    <div>
+      <input type="text" id="serial" name="serial" placeholder="Заводской номер">
+    </div>
+    <div>
+      <input type="text" id="year" inputmode="numeric" name="year" placeholder="Год выпуска">
+    </div>
+    <div>
+      <input type="text" id="reading" inputmode="numeric" name="reading" placeholder="Показания">
+    </div>
+    <div id="error"></div>
+    <div class="button-group">
+      <button type="submit" id="submit">Отправить</button>
+      <button type="reset" id="reset" style="margin-left: 10px">Отмена</button>
+    </div>
+  </form>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-      let tg = window.Telegram.WebApp;
-      let submit = document.getElementById("submit");
-      let reset = document.getElementById("reset");
-      let model_select = document.getElementById("model");
-      let other_model_input = document.getElementById("other_model");
-      let photoInput = document.getElementById("photo");
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    let tg = window.Telegram.WebApp;
+    let submit = document.getElementById("submit");
+    let reset = document.getElementById("reset");
+    let model_select = document.getElementById("model");
+    let other_model_input = document.getElementById("other_model");
+    let photoInput = document.getElementById("photo");
 
-
-      photoInput.addEventListener("change", function(event) {
+    photoInput.addEventListener("change", function(event) {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
           let dataUrl = e.target.result;
-          let base64Image = dataUrl.split(',')[1]; // Extract the base64 data
+          let base64Image = dataUrl.split(',')[1]; // Извлечение данных в формате base64
           photoInput.dataset.base64 = base64Image;
         };
         reader.readAsDataURL(file);
       }
     });
 
+    model_select.addEventListener("change", function() {
+      if (model_select.value === "other") {
+        other_model_input.style.display = "block";
+      } else {
+        other_model_input.style.display = "none";
+      }
+    });
 
-      model_select.addEventListener("change", function() {
-        if (model_select.value === "other") {
-          other_model_input.style.display = "block";
-        } else {
-          other_model_input.style.display = "none";
-        }
-      });
+    let type_select = document.getElementById("type");
+    tg.expand();
 
-      let type_select = document.getElementById("type");
-      tg.expand();
+    let other_model_value = "";
 
-      let other_model_value = "";
+    other_model_input.addEventListener("input", function() {
+      other_model_value = other_model_input.value;
+    });
 
-      other_model_input.addEventListener("input", function() {
-        other_model_value = other_model_input.value;
-      });
+    submit.addEventListener("click", (event) => {
+      event.preventDefault();
 
-      submit.addEventListener("click", (event) => {
-        event.preventDefault();
+      let fullname = document.getElementById("fullname");
+      let address = document.getElementById("address");
+      let phone = document.getElementById("phone");
+      let model = document.getElementById("model");
+      let serial = document.getElementById("serial");
+      let year = document.getElementById("year");
+      let reading = document.getElementById("reading");
+      let other_model = document.getElementById("other_model");
+      let error = document.getElementById("error");
 
-        let fullname = document.getElementById("fullname");
-        let address = document.getElementById("address");
-        let phone = document.getElementById("phone");
-        let model = document.getElementById("model");
-        let serial = document.getElementById("serial");
-        let year = document.getElementById("year");
-        let reading = document.getElementById("reading");
-        let other_model = document.getElementById("other_model");
-        let error = document.getElementById("error");
+      let model_value = model.value;
+      if (model_value === "other" && other_model_value.trim() !== "") {
+        model_value = encodeURIComponent(other_model_value);
+      }
 
-        let model_value = model.value;
-        if (model_value === "other" && other_model_value.trim() !== "") {
-            model_value = encodeURIComponent(other_model_value);
-        }
+      error.innerText = "";
+      let invalidFields = [];
 
-        error.innerText = "";
-        let invalidFields = [];
+      if (fullname.value.trim() === "") {
+        fullname.classList.add("error");
+        invalidFields.push("Клиент");
+      } else {
+        fullname.classList.remove("error");
+      }
 
-        if (fullname.value.trim() === "") {
-          fullname.classList.add("error");
-          invalidFields.push("Клиент");
-        } else {
-          fullname.classList.remove("error");
-        }
+      if (address.value.trim() === "") {
+        address.classList.add("error");
+        invalidFields.push("Адрес");
+      } else {
+        address.classList.remove("error");
+      }
 
-        if (address.value.trim() === "") {
-          address.classList.add("error");
-          invalidFields.push("Адрес");
-        } else {
-          address.classList.remove("error");
-        }
+      if (phone.value.trim() === "" || !/^\+7\d{10}$/.test(phone.value)) {
+        phone.classList.add("error");
+        invalidFields.push("Телефон");
+      } else {
+        phone.classList.remove("error");
+      }
 
-        if (phone.value.trim() === "" || !/^\+7\d{10}$/.test(phone.value)) {
-          phone.classList.add("error");
-          invalidFields.push("Телефон");
-        } else {
-          phone.classList.remove("error");
-        }
-
-        if (model.value === "other") {
-          if (other_model.value.trim() === "") {
-            other_model.classList.add("error");
-            invalidFields.push("Модификация");
-          } else {
-            other_model.classList.remove("error");
-            model.value = other_model_value;
-          }
+      if (model.value === "other") {
+        if (other_model.value.trim() === "") {
+          other_model.classList.add("error");
+          invalidFields.push("Модификация");
         } else {
           other_model.classList.remove("error");
+          model.value = other_model_value;
         }
+      } else {
+        other_model.classList.remove("error");
+      }
 
-        if (serial.value.trim() === "") {
-          serial.classList.add("error");
-          invalidFields.push("Заводской номер");
-        } else {
-          serial.classList.remove("error");
-        }
+      if (serial.value.trim() === "") {
+        serial.classList.add("error");
+        invalidFields.push("Заводской номер");
+      } else {
+        serial.classList.remove("error");
+      }
 
-        if (year.value.trim() === "") {
-          year.classList.add("error");
-          invalidFields.push("Год выпуска");
-        } else {
-          year.classList.remove("error");
-        }
+      if (year.value.trim() === "") {
+        year.classList.add("error");
+        invalidFields.push("Год выпуска");
+      } else {
+        year.classList.remove("error");
+      }
 
-        if (reading.value.trim() === "") {
-          reading.classList.add("error");
-          invalidFields.push("Показания");
-        } else {
-          reading.classList.remove("error");
-        }
+      if (reading.value.trim() === "") {
+        reading.classList.add("error");
+        invalidFields.push("Показания");
+      } else {
+        reading.classList.remove("error");
+      }
 
-        if (invalidFields.length > 0) {
-          error.innerText = "Пожалуйста, заполните следующие поля корректно: " + invalidFields.join(", ");
-          return;
-        }
+      if (invalidFields.length > 0) {
+        error.innerText = "Пожалуйста, заполните следующие поля корректно: " + invalidFields.join(", ");
+        return;
+      }
 
+      if (photoInput.dataset.base64) {
         let data = {
           fullname: fullname.value,
           address: address.value,
@@ -194,16 +184,32 @@
           serial: serial.value,
           year: year.value,
           reading: reading.value,
-          photo: photoInput.dataset.base64 || "", // Include base64-encoded photo if available
+          photo: photoInput.dataset.base64,
         };
 
         tg.sendData(JSON.stringify(data));
         tg.close();
-      });
+      } else {
+        let data = {
+          fullname: fullname.value,
+          address: address.value,
+          phone: phone.value,
+          type: type_select.value,
+          model: model_value,
+          serial: serial.value,
+          year: year.value,
+          reading: reading.value,
+          photo: "",
+        };
 
-      reset.addEventListener("click", () => {
+        tg.sendData(JSON.stringify(data));
         tg.close();
-      });
-    </script>
-  </body>
+      }
+    });
+
+    reset.addEventListener("click", () => {
+      tg.close();
+    });
+  </script>
+</body>
 </html>
