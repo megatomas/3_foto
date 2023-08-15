@@ -15,7 +15,7 @@
 <body>
   <form enctype="multipart/form-data">
     <div>
-      <input type="text" id="fullname" name="fullname" placeholder="КЛИЕНТ">
+      <input type="text" id="fullname" name="fullname" placeholder="Клиент">
     </div>
     <div>
       <input type="file" id="photo" name="photo" accept="image/*">
@@ -32,7 +32,17 @@
     let submit = document.getElementById("submit");
     let reset = document.getElementById("reset");
     let photoInput = document.getElementById("photo");
+    
     photoInput.addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = function() {
+          photoInput.dataset.base64 = reader.result.split(',')[1];
+        }
+        reader.readAsDataURL(file);
+      }
+    
       try {
         let data = {
           fullname: document.getElementById("fullname").value,
