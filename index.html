@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,14 +14,14 @@
 <body>
   <form enctype="multipart/form-data">
     <div>
-      <input type="text" id="fullname" name="fullname" placeholder="Клиент">
+      <input type="text" id="fullname" name="fullname" placeholder="RKBTYN">
     </div>
     <div>
       <input type="file" id="photo" name="photo" accept="image/*">
     </div>
     <div id="error"></div>
     <div class="button-group">
-      <button type="submit" id="submit">Отправить</button>
+      <button type="button" id="submit">Отправить</button>
       <button type="reset" id="reset" style="margin-left: 10px">Отмена</button>
     </div>
   </form>
@@ -32,24 +31,34 @@
     let submit = document.getElementById("submit");
     let reset = document.getElementById("reset");
     let photoInput = document.getElementById("photo");
-    
-    photoInput.addEventListener("change", function(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = function() {
-          photoInput.dataset.base64 = reader.result.split(',')[1];
-        }
-        reader.readAsDataURL(file);
-      }
-    
+
+    submit.addEventListener("click", function() {
       try {
-        let data = {
-          fullname: document.getElementById("fullname").value,
-          photo: photoInput.dataset.base64 || "",
-        };
-        tg.sendData(JSON.stringify(data));
-        tg.close();
+        const fullname = document.getElementById("fullname").value;
+        const file = photoInput.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = function() {
+            const photoBase64 = reader.result.split(',')[1];
+            const data = {
+              fullname: fullname,
+              photo: photoBase64 || "",
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+          }
+          reader.readAsDataURL(file);
+        } else {
+          const data = {
+            fullname: fullname,
+            photo: "",
+          };
+
+          tg.sendData(JSON.stringify(data));
+          tg.close();
+        }
       } catch (error) {
         console.error("Ошибка при отправке данных:", error);
       }
