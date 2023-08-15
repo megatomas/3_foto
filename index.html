@@ -12,9 +12,9 @@
   </style>
 </head>
 <body>
-  <form enctype="multipart/form-data">
+  <form enctype="multipart/form-data" id="myForm">
     <div>
-      <input type="text" id="fullname" name="fullname" placeholder="Клиент">
+      <input type="text" id="fullname" name="fullname" placeholder="КЛИЕНТ">
     </div>
     <div>
       <input type="file" id="photo" name="photo" accept="image/*">
@@ -28,8 +28,43 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     let tg = window.Telegram.WebApp;
+    let myForm = document.getElementById("myForm");
     let reset = document.getElementById("reset");
     let photoInput = document.getElementById("photo");
+
+    myForm.addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      try {
+        const fullname = document.getElementById("fullname").value;
+        const file = photoInput.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = function() {
+            const photoBase64 = reader.result.split(',')[1];
+            const data = {
+              fullname: fullname,
+              photo: photoBase64 || "",
+            };
+
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+          };
+          reader.readAsDataURL(file);
+        } else {
+          const data = {
+            fullname: fullname,
+            photo: "",
+          };
+
+          tg.sendData(JSON.stringify(data));
+          tg.close();
+        }
+      } catch (error) {
+        console.error("Ошибка при отправке данных:", error);
+      }
+    });
 
     reset.addEventListener("click", () => {
       tg.close();
