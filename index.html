@@ -15,7 +15,7 @@
 <body>
   <form enctype="multipart/form-data">
     <div>
-      <input type="text" id="fullname" name="fullname" placeholder="Клиент">
+      <input type="text" id="fullname" name="fullname" placeholder="КЛИЕНТ">
     </div>
     <div>
       <input type="file" id="photo" name="photo" accept="image/*">
@@ -27,37 +27,43 @@
     </div>
   </form>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script>
-    let tg = window.Telegram.WebApp;
-    let submit = document.getElementById("submit");
-    let reset = document.getElementById("reset");
-    let photoInput = document.getElementById("photo");
-    
-    photoInput.addEventListener("change", function(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = function() {
-          photoInput.dataset.base64 = reader.result.split(',')[1];
-        }
-        reader.readAsDataURL(file);
-      }
-    
-      try {
-        let data = {
-          fullname: document.getElementById("fullname").value,
-          photo: photoInput.dataset.base64 || "",
-        };
-        tg.sendData(JSON.stringify(data));
-        tg.close();
-      } catch (error) {
-        console.error("Ошибка при отправке данных:", error);
-      }
-    });
+<script>
+  let tg = window.Telegram.WebApp;
+  let submit = document.getElementById("submit");
+  let reset = document.getElementById("reset");
+  let photoInput = document.getElementById("photo");
 
-    reset.addEventListener("click", () => {
+  // Добавляем обработчик события на кнопку "Отправить"
+  submit.addEventListener("click", function(event) {
+    event.preventDefault(); // Предотвращаем фактическую отправку формы
+
+    try {
+      let data = {
+        fullname: document.getElementById("fullname").value,
+        photo: photoInput.dataset.base64 || "",
+      };
+      
+      tg.sendData(JSON.stringify(data));
       tg.close();
-    });
-  </script>
+    } catch (error) {
+      console.error("Ошибка при отправке данных:", error);
+    }
+  });
+
+  reset.addEventListener("click", () => {
+    tg.close();
+  });
+
+  photoInput.addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = function() {
+        photoInput.dataset.base64 = reader.result.split(',')[1];
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
 </body>
 </html>
