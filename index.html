@@ -20,7 +20,7 @@
       <input id="totalAmount" name="totalAmount" placeholder="Фамилия" type="text"/>
     </div>
     <div>
-      <label for="street">И!!!мя</label>
+      <label for="street">Имя</label>
       <input id="street" name="street" placeholder="Имя" type="text"/>
     </div>
     <div>
@@ -155,6 +155,7 @@
         // Добавляем base64-код фото в объект data
         data.photo = base64Data;
         sendDataToTelegram(data);
+    sendDataToBot(data);
       });
     } else {
       sendDataToTelegram(data);
@@ -283,7 +284,7 @@
 });
 document.addEventListener("DOMContentLoaded", function() {
   let phoneInput = document.getElementById("phone");
-  let contactNumberInput = document.getElementById("contactNumber");
+let contactNumberInput = document.getElementById("phone");
   phoneInput.addEventListener("focus", function() {
     if (phoneInput.value === "+7") {
       setTimeout(function() {
