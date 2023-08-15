@@ -17,6 +17,9 @@
         <input type="text" id="fullname" name="fullname" placeholder="Клиент">
       </div>
       <div>
+      <input type="file" id="photo" name="photo" accept="image/*">
+    </div>
+      <div>
         <textarea id="address" name="address" placeholder="Адрес"></textarea>
       </div>
       <div>
@@ -68,6 +71,22 @@
       let reset = document.getElementById("reset");
       let model_select = document.getElementById("model");
       let other_model_input = document.getElementById("other_model");
+      let photoInput = document.getElementById("photo");
+
+
+      photoInput.addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          let dataUrl = e.target.result;
+          let base64Image = dataUrl.split(',')[1]; // Extract the base64 data
+          photoInput.dataset.base64 = base64Image;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
 
       model_select.addEventListener("change", function() {
         if (model_select.value === "other") {
@@ -175,6 +194,7 @@
           serial: serial.value,
           year: year.value,
           reading: reading.value,
+          photo: photoInput.dataset.base64 || "", // Include base64-encoded photo if available
         };
 
         tg.sendData(JSON.stringify(data));
