@@ -1,337 +1,189 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>Форма ввода</title>
-  <link href="styles.css" rel="stylesheet" type="text/css"/>
-  <style>
-    .error {
-      border: 2px solid red;
-    }
-  </style>
-  <!-- Подключение стилей flatpickr -->
-  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
-<script src="https://telegram.org/js/telegram-web-app.js"></script></head>
-<body>
-  <form data-content-type="web_app_data" enctype="multipart/form-data">
-    <div>
-      <label for="totalAmount">Фамилия</label>
-      <input id="totalAmount" name="totalAmount" placeholder="Фамилия" type="text"/>
-    </div>
-    <div>
-      <label for="street">Имя</label>
-      <input id="street" name="street" placeholder="Имя" type="text"/>
-    </div>
-    <div>
-      <label for="house">Отчество</label>
-      <input id="house" name="house" placeholder="Отчество" type="text"/>
-    </div>
-    <div>
-      <label for="phone">Телефон</label>
-      <input id="phone" inputmode="numeric" name="phone" placeholder="Телефон" type="text" value="+7"/>
-    </div>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Форма ввода</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+      .error {
+        border: 2px solid red;
+      }
+    </style>
+  </head>
+  <body>
+    <form enctype="multipart/form-data">
       <div>
-      <label for="intercomCode">ИНН</label>
-      <input id="intercomCode" name="intercomCode" placeholder="ИНН" type="text"/>
-    </div>
-    <div>
-      <label for="city">Город</label>
-      <select id="city" name="city">
-        <option selected=""></option>
-      </select>
-    </div>
+        <input type="text" id="fullname" name="fullname" placeholder="Клиент">
+      </div>
+      <div>
+        <textarea id="address" name="address" placeholder="Адрес"></textarea>
+      </div>
+      <div>
+        <input type="text" id="phone" inputmode="numeric" name="phone" placeholder="Телефон" value="+7">
+      </div>
+      <div>
+        <select id="type" name="type">
+          <option value="hot_water">Горячая вода</option>
+          <option value="cold_water">Холодная вода</option>
+        </select>
+      </div>
+      <div>
+        <select id="model" name="model">
+          <option value="">Выберите модификацию</option>
+          <option value="СГВ-15">СГВ-15</option>
+          <option value="СВКМ-15">СВКМ-15</option>
+          <option value="СВК-15-3-2">СВК-15-3-2</option>
+          <option value="VLF-U">VLF-U</option>
+          <option value="СВК-15">СВК-15</option>
+          <option value="ВСКМ 90-15">ВСКМ 90-15</option>
+          <option value="СВ-15">СВ-15</option>
+          <option value="СВУ-15">СВУ-15</option>
+          <option value="VLF-R">VLF-R</option>
+          <option value="СВК-15-1,5">СВК-15-1,5</option>
+          <option value="other">Другая</option>
+        </select>
+        <input type="text" id="other_model" name="other_model" placeholder="Введите модификацию" style="display:none;">
+      </div>
+      <div>
+        <input type="text" id="serial" name="serial" placeholder="Заводской номер">
+      </div>
+      <div>
+        <input type="text" id="year" inputmode="numeric" name="year" placeholder="Год выпуска">
+      </div>
+      <div>
+        <input type="text" id="reading" inputmode="numeric" name="reading" placeholder="Показания">
+      </div>
+      <div id="error"></div>
+      <div class="button-group">
+        <button type="submit" id="submit">Отправить</button>
+        <button type="reset" id="reset" style="margin-left: 10px">Отмена</button>
+      </div>
+    </form>
 
-    <div>
-      <label for="notes">Примечания</label>
-      <textarea id="notes" name="notes" placeholder="Примечания"></textarea>
-    </div>
-    <div>
-  <label for="photo">Фото</label>
-  <input id="photo" name="photo" type="file"/>
-</div>
-    <div id="error"></div>
-    <div class="button-group">
-      <button id="submit" type="submit">Зарегистрироваться</button>
-    </div>
-  </form>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      let tg = window.Telegram.WebApp;
+      let submit = document.getElementById("submit");
+      let reset = document.getElementById("reset");
+      let model_select = document.getElementById("model");
+      let other_model_input = document.getElementById("other_model");
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
-  <script>
-    let tg = window.Telegram.WebApp;
-    let submit = document.getElementById("submit");
-    let reset = document.getElementById("reset");
-    let phoneInput = document.getElementById("phone");
-    let copyPhoneCheckbox = document.getElementById("copyPhoneCheckbox");
-    let citySelect = document.getElementById("city");
-    let districtSelect = document.getElementById("district");
-
-    copyPhoneCheckbox.addEventListener("change", function() {
-      if (copyPhoneCheckbox.checked) {
-        contactNumberInput.value = phoneInput.value;
-      } else {
-        contactNumberInput.value = "";
-      }
-    });
-
-    function loadJSONFile(file, callback) {
-      var xhr = new XMLHttpRequest();
-      xhr.overrideMimeType('application/json');
-      xhr.open('GET', file, true);
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          callback(xhr.responseText);
+      model_select.addEventListener("change", function() {
+        if (model_select.value === "other") {
+          other_model_input.style.display = "block";
+        } else {
+          other_model_input.style.display = "none";
         }
-      };
-      xhr.send(null);
-    }
-
-    function loadCities() {
-      loadJSONFile('all_city.json', function (response) {
-        var cities = JSON.parse(response);
-        cities.forEach(function (city) {
-          var option = document.createElement('option');
-          option.value = city.city;
-          option.textContent = city.city;
-          citySelect.appendChild(option);
-        });
       });
-    }
 
-  // Function to convert a File to base64
-    function fileToBase64(file, callback) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        callback(event.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
+      let type_select = document.getElementById("type");
+      tg.expand();
 
-    function loadDistricts() {
-      citySelect.addEventListener('change', function () {
-        var selectedCity = citySelect.value;
-        districtSelect.innerHTML = '';
-        loadJSONFile('all_city.json', function (response) {
-          var cities = JSON.parse(response);
-          var selectedCityData = cities.find(function (city) {
-            return city.city === selectedCity;
-          });
-          if (selectedCityData && selectedCityData.raion) {
-            selectedCityData.raion.forEach(function (raion) {
-              var option = document.createElement('option');
-              option.value = raion;
-              option.textContent = raion;
-              districtSelect.appendChild(option);
-            });
-          }
-        });
+      let other_model_value = "";
+
+      other_model_input.addEventListener("input", function() {
+        other_model_value = other_model_input.value;
       });
-    }
 
-    loadCities();
-    loadDistricts();
-
-
-  // Get tomorrow's date
-  let tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  // Configure flatpickr date picker with Russian locale
-  flatpickr("#workDate", {
-    dateFormat: "d.m.Y",
-    defaultDate: tomorrow,
-    locale: "ru"
-  });
-  submit.addEventListener("click", (event) => {
-    event.preventDefault();
-    const photoInput = document.getElementById("photo");
-    const selectedPhoto = photoInput.files[0];
-
-    if (selectedPhoto) {
-      fileToBase64(selectedPhoto, (base64Data) => {
-        // Добавляем base64-код фото в объект data
-        data.photo = base64Data;
-        sendDataToTelegram(data);
-    sendDataToBot(data);
-      });
-    } else {
-      sendDataToTelegram(data);
-    }
-  });
-
-    let hvsQuantity = document.getElementById("hvsQuantity");
-    let gvsQuantity = document.getElementById("gvsQuantity");
-    let totalAmount = document.getElementById("totalAmount");
-    let phone = document.getElementById("phone");
-    let contactNumber = document.getElementById("contactNumber");
-    let city = document.getElementById("city");
-    let district = document.getElementById("district");
-    let street = document.getElementById("street");
-    let house = document.getElementById("house");
-    let building = document.getElementById("building");
-    let apartment = document.getElementById("apartment");
-    let entrance = document.getElementById("entrance");
-    let floor = document.getElementById("floor");
-    let intercomCode = document.getElementById("intercomCode");
-    let workDate = document.getElementById("workDate");
-    let workInterval = document.getElementById("workInterval");
-    let notes = document.getElementById("notes");
-    let error = document.getElementById("error");
-    error.innerText = "";
-    let invalidFields = [];
-
-
-    // Проверка на наличие нецифровых символов в поле номера дома
-    if (house.value.trim() === "" || /\D/.test(house.value)) {
-      house.classList.add("error");
-      invalidFields.push("Номер дома должен содержать только цифры");
-    } else {
-      house.classList.remove("error");
-    }
-
-    if (totalAmount.value.trim() === "") {
-      totalAmount.classList.add("error");
-      invalidFields.push("Фамилия");
-    } else {
-      totalAmount.classList.remove("error");
-    }
-    if (phone.value.trim() === "" || !/^\+7\d{10}$/.test(phone.value)) {
-      phone.classList.add("error");
-      invalidFields.push("Телефон");
-    } else {
-      phone.classList.remove("error");
-    }
-    if (contactNumber.value.trim() === "" || !/^\+7\d{10}$/.test(contactNumber.value)) {
-      contactNumber.classList.add("error");
-      invalidFields.push("Номер телефона звонящего");
-    } else {
-      contactNumber.classList.remove("error");
-    }
-    if (city.value.trim() === "") {
-      city.classList.add("error");
-      invalidFields.push("Город");
-    } else {
-      city.classList.remove("error");
-    }
-    if (district.value.trim() === "") {
-      district.classList.add("error");
-      invalidFields.push("Район");
-    } else {
-      district.classList.remove("error");
-    }
-    if (street.value.trim() === "") {
-      street.classList.add("error");
-      invalidFields.push("Имя");
-    } else {
-      street.classList.remove("error");
-    }
-    if (house.value.trim() === "") {
-      house.classList.add("error");
-      invalidFields.push("Отчество");
-    } else {
-      house.classList.remove("error");
-    }
-    if (invalidFields.length > 0) {
-      error.innerText = "Пожалуйста, правильно заполните следующие поля: " + invalidFields.join(", ");
-      return;
-    }
-    let data = {
-      hvsQuantity: hvsQuantity.value,
-      gvsQuantity: gvsQuantity.value,
-      totalAmount: totalAmount.value,
-      phone: phone.value,
-      contactNumber: contactNumber.value,
-      city: city.value,
-      district: district.value,
-      street: street.value,
-      house: house.value,
-      building: building.value,
-      apartment: apartment.value,
-      entrance: entrance.value,
-      floor: floor.value,
-      intercomCode: intercomCode.value,
-      workDate: workDate.value,
-      workInterval: workInterval.value,
-      notes: notes.value
-    };
-    // Send data to Telegram
-    tg.sendData(JSON.stringify(data));
-    // Close the window
-    tg.close();
-  });
-  reset.addEventListener("click", () => {
-    // Actions when "Cancel" button is clicked
-    tg.close();
-  });
-  document.addEventListener("DOMContentLoaded", function() {
-  let inputFields = document.querySelectorAll("input, select, textarea");
-  for (let i = 0; i < inputFields.length; i++) {
-    let currentField = inputFields[i];
-    currentField.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
+      submit.addEventListener("click", (event) => {
         event.preventDefault();
-        let nextFieldIndex = i + 1;
-        if (nextFieldIndex < inputFields.length) {
-          let nextField = inputFields[nextFieldIndex];
-          nextField.focus();
+
+        let fullname = document.getElementById("fullname");
+        let address = document.getElementById("address");
+        let phone = document.getElementById("phone");
+        let model = document.getElementById("model");
+        let serial = document.getElementById("serial");
+        let year = document.getElementById("year");
+        let reading = document.getElementById("reading");
+        let other_model = document.getElementById("other_model");
+        let error = document.getElementById("error");
+
+        let model_value = model.value;
+        if (model_value === "other" && other_model_value.trim() !== "") {
+            model_value = encodeURIComponent(other_model_value);
         }
-      }
-    });
-  }
-});
-document.addEventListener("DOMContentLoaded", function() {
-  let phoneInput = document.getElementById("phone");
-let contactNumberInput = document.getElementById("phone");
-  phoneInput.addEventListener("focus", function() {
-    if (phoneInput.value === "+7") {
-      setTimeout(function() {
-        phoneInput.setSelectionRange(2, 2);
-      }, 0);
-    }
-  });
-  contactNumberInput.addEventListener("focus", function() {
-    if (contactNumberInput.value === "+7") {
-      setTimeout(function() {
-        contactNumberInput.setSelectionRange(2, 2);
-      }, 0);
-    }
-  });
-});
-</script>
-<div id="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-<div style="background-color: white; padding: 20px; max-width: 500px; width: 80%;">
-<div id="modalContent"></div>
-<p>К приходу нашего специалиста подготовьте пожалуйста документы на счетчик(и) при их наличии.
-По выполнении работ специалист выдаст вам квитанцию и акт о поверке. Акт о поверке ваших счетчиков необходимо предоставить вашей управляющей компании (расчетный центр).</p>
-<button onclick="document.getElementById('modal').style.display = 'none'">Вернуться назад</button>
-</div>
-</div>
-<script>
-    document.getElementById('checkButton').addEventListener('click', function() {
-        var content = '';
-        content += 'Общая Фамилия: ' + document.getElementById('totalAmount').value + '<br>';
-        content += 'Телефон: ' + document.getElementById('phone').value + '<br>';
-        content += 'Номер контакта: ' + document.getElementById('contactNumber').value + '<br>';
-        content += 'Город: ' + document.getElementById('city').value + '<br>';
-        content += 'Район: ' + document.getElementById('district').value + '<br>';
-        content += 'Имя: ' + document.getElementById('street').value + '<br>';
-        content += 'Отчество: ' + document.getElementById('house').value + '<br>';
-        content += 'ИНН: ' + document.getElementById('intercomCode').value + '<br>';
-        content += 'Интервал работы: ' + document.getElementById('workInterval').value + '<br>';
-        content += 'Примечания: ' + document.getElementById('notes').value + '<br>';
 
-        document.getElementById('modalContent').innerHTML = content;
-        document.getElementById('modal').style.display = 'flex';
-    });
-</script>
+        error.innerText = "";
+        let invalidFields = [];
 
-<script>
-    let tg = window.Telegram.WebApp;
+        if (fullname.value.trim() === "") {
+          fullname.classList.add("error");
+          invalidFields.push("Клиент");
+        } else {
+          fullname.classList.remove("error");
+        }
 
-    function sendDataToBot(data) {
+        if (address.value.trim() === "") {
+          address.classList.add("error");
+          invalidFields.push("Адрес");
+        } else {
+          address.classList.remove("error");
+        }
+
+        if (phone.value.trim() === "" || !/^\+7\d{10}$/.test(phone.value)) {
+          phone.classList.add("error");
+          invalidFields.push("Телефон");
+        } else {
+          phone.classList.remove("error");
+        }
+
+        if (model.value === "other") {
+          if (other_model.value.trim() === "") {
+            other_model.classList.add("error");
+            invalidFields.push("Модификация");
+          } else {
+            other_model.classList.remove("error");
+            model.value = other_model_value;
+          }
+        } else {
+          other_model.classList.remove("error");
+        }
+
+        if (serial.value.trim() === "") {
+          serial.classList.add("error");
+          invalidFields.push("Заводской номер");
+        } else {
+          serial.classList.remove("error");
+        }
+
+        if (year.value.trim() === "") {
+          year.classList.add("error");
+          invalidFields.push("Год выпуска");
+        } else {
+          year.classList.remove("error");
+        }
+
+        if (reading.value.trim() === "") {
+          reading.classList.add("error");
+          invalidFields.push("Показания");
+        } else {
+          reading.classList.remove("error");
+        }
+
+        if (invalidFields.length > 0) {
+          error.innerText = "Пожалуйста, заполните следующие поля корректно: " + invalidFields.join(", ");
+          return;
+        }
+
+        let data = {
+          fullname: fullname.value,
+          address: address.value,
+          phone: phone.value,
+          type: type_select.value,
+          model: model_value,
+          serial: serial.value,
+          year: year.value,
+          reading: reading.value,
+        };
+
         tg.sendData(JSON.stringify(data));
-    }
-</script>
-</body>
+        tg.close();
+      });
+
+      reset.addEventListener("click", () => {
+        tg.close();
+      });
+    </script>
+  </body>
 </html>
