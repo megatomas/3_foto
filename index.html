@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,80 +20,28 @@
     <div>
       <input type="file" id="photo" name="photo" accept="image/*">
     </div>
-    <div>
-
-    </div>
-    <div>
-
-    </div>
-    <div>
-
-    </div>
-    <div>
-
-    </div>
-    <div>
-
-    </div>
     <div id="error"></div>
     <div class="button-group">
       <button type="submit" id="submit">Отправить</button>
       <button type="reset" id="reset" style="margin-left: 10px">Отмена</button>
     </div>
   </form>
-
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     let tg = window.Telegram.WebApp;
     let submit = document.getElementById("submit");
     let reset = document.getElementById("reset");
     let photoInput = document.getElementById("photo");
-
     photoInput.addEventListener("change", function(event) {
-      const file = event.target.files[0];
-
-
-
-
-
-
-
-
-
-
-
-
-      if (invalidFields.length > 0) {
-        error.innerText = "Пожалуйста, заполните следующие поля корректно: " + invalidFields.join(", ");
-        return;
-      }
-
-      if (photoInput.dataset.base64) {
+      try {
         let data = {
-          fullname: fullname.value,
-          address: address.value,
-          phone: phone.value,
-          serial: serial.value,
-          year: year.value,
-          reading: reading.value,
-          photo: photoInput.dataset.base64,
+          fullname: document.getElementById("fullname").value,
+          photo: photoInput.dataset.base64 || "",
         };
-
         tg.sendData(JSON.stringify(data));
         tg.close();
-      } else {
-        let data = {
-          fullname: fullname.value,
-          address: address.value,
-          phone: phone.value,
-          serial: serial.value,
-          year: year.value,
-          reading: reading.value,
-          photo: "",
-        };
-
-        tg.sendData(JSON.stringify(data));
-        tg.close();
+      } catch (error) {
+        console.error("Ошибка при отправке данных:", error);
       }
     });
 
